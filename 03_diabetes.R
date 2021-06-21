@@ -177,13 +177,13 @@ diabetes_age <- svyby(~HBA1C,
 round(diabetes_age[, 2:4], 1)
 
 ## Calculate quantiles
-round(svyby(~SBP,
+round(svyby(~HBA1C,
             by = ~Age_categories,
             FUN = svyquantile,
             design = design_obj,
             na.rm = TRUE,
             quantiles = c(0, 0.25, 0.50, 0.75, 1),
-            keep.var = FALSE)[, 2:6])
+            keep.var = FALSE)[, 2:6], 1)
 
 ## Calculate crude number of individuals
 data %>%
