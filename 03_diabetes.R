@@ -15,6 +15,7 @@ library(purrr)
 library(knitr)
 library(ggplot2)
 library(ggthemes)
+library(patchwork)
 
 ####################
 #   ggplot theme   #
@@ -554,7 +555,7 @@ plot_DB_age <- ggplot(data = DB_combined_age) +
     scale_fill_tableau(name = 'Method of diagnosis',
                        label = c('HbA1c measured',
                                  'Recalled being diagnosed')) +
-    scale_y_continuous(limits = c(0, 35),
+    scale_y_continuous(limits = c(0, 50),
                        expand = c(0, 0)) +
     scale_x_discrete() +
     theme(legend.position = c(0.2, 0.93))
@@ -563,3 +564,118 @@ ggsave(filename = 'figures/15_diabetes_age.png',
        plot = plot_DB_age,
        width = 8,
        height = 6)
+
+########################
+#   Publication plot   #
+########################
+# Overall
+plot_DB_stack <- ggplot(data = DB_combined) +
+    aes(x = group,
+        y = mean,
+        colour = group,
+        fill = group,
+        ymin = `2.5 %`,
+        ymax = `97.5 %`) +
+    geom_col(alpha = 0.5) +
+    geom_errorbar(width = 0.3,
+                  size = 1,
+                  show.legend = FALSE) +
+    labs(title = 'Overall',
+         y = NULL,
+         x = NULL) +
+    scale_colour_tableau(name = 'Method of diagnosis',
+                         label = c('HbA1c measured',
+                                   'Recalled being diagnosed')) +
+    scale_fill_tableau(name = 'Method of diagnosis',
+                       label = c('HbA1c measured',
+                                 'Recalled being diagnosed')) +
+    scale_y_continuous(limits = c(0, 40),
+                       expand = c(0, 0)) +
+    scale_x_discrete(label = c('Measured',
+                               'Diagnosed')) +
+    theme_minimal(base_size = 24) +
+    theme(legend.position = c(0.78, 0.93),
+          legend.title = element_text(size = 18),
+          legend.text = element_text(size = 16),
+          plot.title = element_text(size = 24),
+          panel.grid = element_blank(),
+          axis.text = element_text(colour = '#000000'),
+          axis.line = element_line(colour = '#000000',
+                                   size = 0.6),
+          axis.ticks = element_line(colour = '#000000',
+                                    size = 0.6))
+
+# Sex
+plot_DB_sex_stack <- ggplot(data = DB_combined_sex) +
+    aes(x = sex,
+        y = estimate,
+        colour = group,
+        fill = group,
+        ymin = ci_lower,
+        ymax = ci_upper) +
+    geom_col(position = position_dodge(0.9),
+             alpha = 0.5) +
+    geom_errorbar(position = position_dodge(0.9),
+                  width = 0.3,
+                  size = 1,
+                  show.legend = FALSE) +
+    labs(title = 'Sex',
+         y = 'Percent with diabetes (%)',
+         x = NULL) +
+    scale_colour_tableau() +
+    scale_fill_tableau() +
+    scale_y_continuous(limits = c(0, 40),
+                       expand = c(0, 0)) +
+    scale_x_discrete() +
+    theme_minimal(base_size = 24) +
+    theme(legend.position = 'none',
+          plot.title = element_text(size = 24),
+          panel.grid = element_blank(),
+          axis.text = element_text(colour = '#000000'),
+          axis.line = element_line(colour = '#000000',
+                                   size = 0.6),
+          axis.ticks = element_line(colour = '#000000',
+                                    size = 0.6))
+
+# Age
+plot_DB_age_stack <- ggplot(data = DB_combined_age) +
+    aes(x = age_categories,
+        y = estimate,
+        colour = group,
+        fill = group,
+        ymin = ci_lower,
+        ymax = ci_upper) +
+    geom_col(position = position_dodge(0.9),
+             alpha = 0.5) +
+    geom_errorbar(position = position_dodge(0.9),
+                  width = 0.3,
+                  size = 1,
+                  show.legend = FALSE) +
+    labs(title = 'Age group (years)',
+         y = NULL,
+         x = NULL) +
+    scale_colour_tableau() +
+    scale_fill_tableau() +
+    scale_y_continuous(limits = c(0, 40),
+                       expand = c(0, 0)) +
+    scale_x_discrete() +
+    theme_minimal(base_size = 24) +
+    theme(legend.position = 'none',
+          plot.title = element_text(size = 24),
+          panel.grid = element_blank(),
+          axis.text = element_text(colour = '#000000'),
+          axis.line = element_line(colour = '#000000',
+                                   size = 0.6),
+          axis.ticks = element_line(colour = '#000000',
+                                    size = 0.6))
+
+# Stacking
+plot_stacked <- plot_DB_stack +
+    plot_DB_sex_stack +
+    plot_DB_age_stack +
+    plot_layout(ncol = 1)
+
+ggsave(filename = 'figures/figure-2.png',
+       plot = plot_stacked,
+       height = 16,
+       width = 8)
