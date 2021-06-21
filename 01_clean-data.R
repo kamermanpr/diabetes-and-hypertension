@@ -4,6 +4,10 @@
 #                                                          #
 ############################################################
 
+# Please note: DHS data are freely available for projects registered on the
+# DHS Program system, but cannot be distributed by a third-party.
+# DHS Program website: https://dhsprogram.com
+
 #####################
 #   Load packages   #
 #####################
