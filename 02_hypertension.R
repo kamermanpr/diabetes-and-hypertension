@@ -44,6 +44,20 @@ design_obj <- svydesign(ids = ~V021, # Primary sampling units
 ############################
 #   Exploratory analysis   #
 ############################
+#-- Answers to the questionnaire --#
+data %>%
+    group_by(Hypertension_question) %>%
+    summarise(count = n()) %>%
+    mutate(total = sum(count)) %>%
+    kable()
+
+data %>%
+    group_by(Sex, Hypertension_question) %>%
+    summarise(count = n()) %>%
+    mutate(total = sum(count)) %>%
+    ungroup() %>%
+    mutate(overll_n = sum(count)) %>%
+    kable()
 
 #-- No stratification --#
 # Systolic
@@ -777,7 +791,7 @@ plot_HT_stack <- ggplot(data = HT_combined) +
     scale_y_continuous(limits = c(0, 100),
                        expand = c(0, 0)) +
     scale_x_discrete(label = c('Measured',
-                               'Diagnosed')) +
+                               'Recall')) +
     theme_minimal(base_size = 24) +
     theme(legend.position = c(0.78, 0.93),
           legend.title = element_text(size = 18),
