@@ -314,7 +314,7 @@ analysis_set <- sex_clean %>%
     left_join(biomarker_clean) %>%
     # Select and order columns
     select(V021, V022, SWEIGHT,
-           Sex, Age_years, Age_categories,
+           Sex, Age_years, Age_categories, Rx_assessed,
            Hypertension_question, Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
            Diabetes_question, Diabetes_treatment_question,
