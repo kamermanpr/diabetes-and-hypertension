@@ -236,6 +236,14 @@ men_clean <- men_reduced %>%
         Hypertension_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Hypertension_question = factor(Hypertension_question)) %>%
+    # Hypertension_treatment_question: Recode "Don't know..." to 'No'
+    mutate(Hypertension_treatment_question = as.character(Hypertension_treatment_question)) %>%
+    mutate(Hypertension_treatment_question = case_when(
+        Hypertension_treatment_question == 'No' |
+            Hypertension_treatment_question == "Don't know/don't remember" ~ 'No',
+        Hypertension_treatment_question == 'Yes' ~ 'Yes'
+    )) %>%
+    mutate(Hypertension_treatment_question = factor(Hypertension_treatment_question)) %>%
     # Diabetes_question: Recode "Don't know" values to "No",
     mutate(Diabetes_question = as.character(Diabetes_question)) %>%
     mutate(Diabetes_question = case_when(
@@ -243,7 +251,15 @@ men_clean <- men_reduced %>%
             Diabetes_question == "Don't know" ~ 'No',
         Diabetes_question == 'Yes' ~ 'Yes'
     )) %>%
-    mutate(Diabetes_question = factor(Diabetes_question))
+    mutate(Diabetes_question = factor(Diabetes_question)) %>%
+    # Diabetes_treatment_question: Recode "Don't know..." to 'No'
+    mutate(Diabetes_treatment_question = as.character(Diabetes_treatment_question)) %>%
+    mutate(Diabetes_treatment_question = case_when(
+        Diabetes_treatment_question == 'No' |
+            Diabetes_treatment_question == "Don't know/don't remember" ~ 'No',
+        Diabetes_treatment_question == 'Yes' ~ 'Yes'
+    )) %>%
+    mutate(Diabetes_treatment_question = factor(Diabetes_treatment_question))
 
 ##########################
 #   Clean women's data   #
@@ -293,6 +309,14 @@ women_clean <- women_reduced %>%
         Hypertension_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Hypertension_question = factor(Hypertension_question)) %>%
+    # Hypertension_treatment_question: Recode "Don't know..." to 'No'
+    mutate(Hypertension_treatment_question = as.character(Hypertension_treatment_question)) %>%
+    mutate(Hypertension_treatment_question = case_when(
+        Hypertension_treatment_question == 'No' |
+            Hypertension_treatment_question == "Don't know/don't remember" ~ 'No',
+        Hypertension_treatment_question == 'Yes' ~ 'Yes'
+    )) %>%
+    mutate(Hypertension_treatment_question = factor(Hypertension_treatment_question)) %>%
     # Diabetes_question: Recode "Don't know" values to "No",
     mutate(Diabetes_question = as.character(Diabetes_question)) %>%
     mutate(Diabetes_question = case_when(
@@ -300,7 +324,16 @@ women_clean <- women_reduced %>%
             Diabetes_question == "Don't know" ~ 'No',
         Diabetes_question == 'Yes' ~ 'Yes'
     )) %>%
-    mutate(Diabetes_question = factor(Diabetes_question))
+    mutate(Diabetes_question = factor(Diabetes_question)) %>%
+    # Diabetes_treatment_question: Recode "Don't know..." to 'No'
+    mutate(Diabetes_treatment_question = as.character(Diabetes_treatment_question)) %>%
+    mutate(Diabetes_treatment_question = case_when(
+        Diabetes_treatment_question == 'No' |
+            Diabetes_treatment_question == "Don't know/don't remember" ~ 'No',
+        Diabetes_treatment_question == 'Yes' ~ 'Yes'
+    )) %>%
+    mutate(Diabetes_treatment_question = factor(Diabetes_treatment_question))
+
 
 ##############################################
 #   Vertical join: women_clean + men_clean   #

@@ -2866,7 +2866,7 @@ V021,V022,SWEIGHT,Sex,Age_years,Age_categories,Rx_assessed,Hypertension_question
 338,Traditional - Northern Cape,0.363672,Female,38,35-44,None,No,NA,FALSE,No,130.5,83.5,No,NA,FALSE,NA,NA
 338,Traditional - Northern Cape,0.363672,Female,16,15-24,None,No,NA,FALSE,No,125.5,78,No,NA,FALSE,NA,NA
 338,Traditional - Northern Cape,0.363672,Female,22,15-24,Refused,Yes,No,FALSE,NA,NA,NA,No,NA,FALSE,NA,NA
-338,Traditional - Northern Cape,0.363672,Female,58,55-64,Medicines seen,Yes,Yes,FALSE,No,92.5,57.5,Yes,Don't know/don't remember,FALSE,No,6.154
+338,Traditional - Northern Cape,0.363672,Female,58,55-64,Medicines seen,Yes,Yes,FALSE,No,92.5,57.5,Yes,No,FALSE,No,6.154
 338,Traditional - Northern Cape,0.363672,Female,26,25-34,None,Yes,No,FALSE,No,132,79.5,No,NA,FALSE,No,5.445
 338,Traditional - Northern Cape,0.363672,Female,52,45-54,None,No,NA,FALSE,No,126,86,No,NA,FALSE,No,6.256
 338,Traditional - Northern Cape,0.363672,Female,26,25-34,None,No,NA,FALSE,No,106,68,No,NA,FALSE,No,5.445
@@ -6837,7 +6837,7 @@ V021,V022,SWEIGHT,Sex,Age_years,Age_categories,Rx_assessed,Hypertension_question
 121,Urban - Free State,0.582295,Male,55,55-64,None,Yes,No,FALSE,Yes,169,116,No,NA,FALSE,No,6.154
 121,Urban - Free State,0.582295,Male,22,15-24,None,No,NA,FALSE,NA,NA,NA,No,NA,FALSE,NA,NA
 121,Urban - Free State,0.582295,Male,53,45-54,None,No,NA,FALSE,No,105.5,69.5,No,NA,FALSE,Yes,6.56
-121,Urban - Free State,0.582295,Male,50,45-54,None,Yes,Don't know/don't remember,FALSE,Yes,139.5,90,No,NA,FALSE,No,6.357
+121,Urban - Free State,0.582295,Male,50,45-54,None,Yes,No,FALSE,Yes,139.5,90,No,NA,FALSE,No,6.357
 121,Urban - Free State,0.582295,Male,21,15-24,Not present,No,NA,FALSE,NA,NA,NA,No,NA,FALSE,NA,NA
 121,Urban - Free State,0.582295,Male,36,35-44,Medicines seen,No,NA,FALSE,Yes,139.5,92.5,Yes,Yes,TRUE,Yes,17.507
 121,Urban - Free State,0.582295,Male,15,15-24,None,No,NA,FALSE,No,116,74.5,No,NA,FALSE,No,5.648
