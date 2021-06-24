@@ -12,6 +12,8 @@
 #   Load packages   #
 #####################
 library(dplyr)
+library(tidyr)
+library(stringr)
 library(readr)
 library(foreign)
 
@@ -45,7 +47,9 @@ biomarker_reduced <- biomarker %>%
            SH332A, # Third reading systolic (men)
            SH332B, # Third reading diastolic (men)
            SHWHBA1C, # HBA1c (women). Note: 3 decimals implicit
-           SHMHBA1C)  %>%  # HBA1c (men). Note: 3 decimals implicit
+           SHMHBA1C, # HBA1c (men). Note: 3 decimals implicit
+           starts_with('SH277'), # Female medication check-list
+           starts_with('SH377')) %>%  # Male medication check-list
     # Rename variables
     ## SBP/DBP = systolic/diastolic blood pressure,
     rename(V001 = HV001,
@@ -65,7 +69,7 @@ biomarker_reduced <- biomarker %>%
 #-- Clean hypertension data --#
 biomarker_BP <- biomarker_reduced %>%
     # Select columns
-    select(-starts_with('HBA1C')) %>%
+    select(-starts_with('HBA1C'), -starts_with('SH277'), -starts_with('SH377')) %>%
     # Convert all BP columns to numeric format
     # Conversion will convert all non-numeric codes ('Other' and 'Technical problems') to <NA>
     mutate(across(.cols = starts_with('SBP'), ~as.numeric(as.character(.x))),
@@ -136,9 +140,47 @@ biomarker_HBA1c <- biomarker_reduced %>%
     )) %>%
     mutate(Diabetes_measured = factor(Diabetes_measured))
 
-# Join biomarker_BP and biomarker_HBA1c
+#-- Clean medication data --#
+biomarker_rx <- biomarker_reduced %>%
+    # Select columns
+    select(starts_with('V0'), starts_with('SH277'), starts_with('SH377')) %>%
+    # Rename medication assessment columns
+    rename(Rx_assessed_women = SH277,
+           Rx_assessed_men = SH377) %>%
+    # Convert Rx_assessed_* to character
+    mutate(across(.cols = starts_with('Rx_assessed_'), ~ as.character(.x))) %>%
+    # Combine Rx_assessed_* columns
+    mutate(Rx_assessed = ifelse(is.na(Rx_assessed_women),
+                                yes = Rx_assessed_men,
+                                no = Rx_assessed_women),
+           Rx_assessed = factor(Rx_assessed)) %>%
+    # Remove men and womens Rx_assessed columns
+    select(-starts_with('Rx_assessed_')) %>%
+    # Unite SH277A-L and SH377A-L
+    unite(col = 'Rx',
+          matches('77[A-L]')) %>%
+    # Check for anti-hypertensives medications
+    # WHO ATC codes: C02, C03, C07, C08, C09
+    mutate(Rx_hypertension = str_detect(Rx,
+                                        pattern = c('C02|C03|C07|C08|C09'))) %>%
+    # Check for anti-diabetic medications
+    # WHO ATC code: A10
+    mutate(Rx_diabetes = str_detect(Rx,
+                                    pattern = 'A10')) %>%
+    # Remove Rx column
+    select(-Rx) %>%
+    # Fill in <NA> in Rx_* when Rx_assessed is <NA>
+    mutate(Rx_hypertension = ifelse(is.na(Rx_assessed),
+                                    yes = NA,
+                                    no = Rx_hypertension),
+           Rx_diabetes = ifelse(is.na(Rx_assessed),
+                                yes = NA,
+                                no = Rx_diabetes))
+
+# Join biomarker_BP, biomarker_HBA1c, and biomarker_rx
 biomarker_clean <- biomarker_BP %>%
-    left_join(biomarker_HBA1c)
+    left_join(biomarker_HBA1c) %>%
+    left_join(biomarker_rx)
 
 ########################
 #   Clean men's data   #
@@ -154,7 +196,9 @@ men_reduced <- men %>%
            SMWEIGHT, # Sample weight Note: 6 decimals implicit
            MV012, # Age in years
            SM1108A, # Diagnosed with high blood pressure
-           SM1108F) %>% # Diagnosed with diabetes
+           SM1111, # If diagnosed, then did you receive medication for hypertension
+           SM1108F, # Diagnosed with diabetes
+           SM1121) %>% # If diagnosed, then did you receive medication for diabetes
     # Rename variables
     rename(V001 = MV001,
            V002 = MV002,
@@ -164,7 +208,9 @@ men_reduced <- men %>%
            SWEIGHT = SMWEIGHT,
            Age_years = MV012,
            Hypertension_question =  SM1108A,
-           Diabetes_question = SM1108F) %>%
+           Hypertension_treatment_question = SM1111,
+           Diabetes_question = SM1108F,
+           Diabetes_treatment_question = SM1121) %>%
     # Add sex column
     mutate(Sex = 'Male')
 
@@ -213,11 +259,15 @@ women_reduced <- women %>%
            SWEIGHT, # Sample weight Note: 6 decimals implicit
            V012, # Age in years
            S1413A, # Diagnosed with high blood pressure
-           S1413F) %>% # Diagnosed with diabetes
+           S1416, # If diagnosed, then did you receive medication for hypertension
+           S1413F, # Diagnosed with diabetes
+           S1426) %>% # If diagnosed, then did you receive medication for diabetes
     # Rename variables
     rename(Age_years = V012,
            Hypertension_question =  S1413A,
-           Diabetes_question = S1413F) %>%
+           Hypertension_treatment_question = S1416,
+           Diabetes_question = S1413F,
+           Diabetes_treatment_question = S1426) %>%
     # Add sex column
     mutate(Sex = 'Female')
 
@@ -265,8 +315,10 @@ analysis_set <- sex_clean %>%
     # Select and order columns
     select(V021, V022, SWEIGHT,
            Sex, Age_years, Age_categories,
-           Hypertension_question, Hypertension_measured, SBP, DBP,
-           Diabetes_question, Diabetes_measured, HBA1C)
+           Hypertension_question, Hypertension_treatment_question,
+           Rx_hypertension, Hypertension_measured, SBP, DBP,
+           Diabetes_question, Diabetes_treatment_question,
+           Rx_diabetes, Diabetes_measured, HBA1C)
 
 #######################
 #   Save clean data   #
