@@ -175,7 +175,12 @@ biomarker_rx <- biomarker_reduced %>%
                                     no = Rx_hypertension),
            Rx_diabetes = ifelse(is.na(Rx_assessed),
                                 yes = NA,
-                                no = Rx_diabetes))
+                                no = Rx_diabetes)) %>%
+    # Create new columns based on whether Rx_assessed is
+    # 'Medicines seen' or not
+    mutate(Rx_medicines_seen = ifelse(Rx_assessed == 'Medicines seen',
+                                      yes = TRUE,
+                                      no = NA))
 
 # Join biomarker_BP, biomarker_HBA1c, and biomarker_rx
 biomarker_clean <- biomarker_BP %>%
@@ -227,8 +232,44 @@ men_clean <- men_reduced %>%
         Age_years >= 45 & Age_years < 55 ~ '45-54',
         Age_years >= 55 & Age_years < 65 ~ '55-64',
         Age_years >= 65 ~ '65+'
-    )) %>%
-    # Hypertension_question: Recode "Don't know" values to "No",
+    ))
+
+# Check number of "Don't know" / "Don't know/don't remember"
+## Hypertension_question
+men_clean %>%
+    group_by(Hypertension_question) %>%
+    summarise(Count = n()) %>%
+    ungroup() %>%
+    mutate(Percent = 100 * (Count / sum(Count))) # 32 = Don't know (0.76%)
+
+## Hypertension_treatment_question
+men_clean %>%
+    filter(Hypertension_question == 'Yes') %>%
+    group_by(Hypertension_treatment_question) %>%
+    summarise(Count = n()) %>%
+    ungroup() %>%
+    mutate(Percent = 100 * (Count / sum(Count))) # 1 = Don't know/don't remember (0.18%)
+
+## Diabetes_question
+men_clean %>%
+    group_by(Diabetes_question) %>%
+    summarise(Count = n()) %>%
+    ungroup() %>%
+    mutate(Percent = 100 * (Count / sum(Count))) # 34 = Don't know (0.81%)
+
+## Diabetes_treatment_question
+men_clean %>%
+    filter(Diabetes_question == 'Yes') %>%
+    group_by(Diabetes_treatment_question) %>%
+    summarise(Count = n()) %>%
+    ungroup() %>%
+    mutate(Percent = 100 * (Count / sum(Count))) # 0 = Don't know/don't remember (0%)
+
+### "Don't know" or "Don't know/don't remember" missingness < 1% for all variables
+### Therefore, convert all "Don't know" or "Don't know/don't remember" values to "No"
+
+men_final <- men_clean %>%
+    # Hypertension_question: Recode "Don't know" values to "No"
     mutate(Hypertension_question = as.character(Hypertension_question)) %>%
     mutate(Hypertension_question = case_when(
         Hypertension_question == 'No' |
@@ -236,7 +277,7 @@ men_clean <- men_reduced %>%
         Hypertension_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Hypertension_question = factor(Hypertension_question)) %>%
-    # Hypertension_treatment_question: Recode "Don't know..." to 'No'
+    # Hypertension_treatment_question: Recode "Don't know/don't remember" to "No"
     mutate(Hypertension_treatment_question = as.character(Hypertension_treatment_question)) %>%
     mutate(Hypertension_treatment_question = case_when(
         Hypertension_treatment_question == 'No' |
@@ -244,7 +285,7 @@ men_clean <- men_reduced %>%
         Hypertension_treatment_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Hypertension_treatment_question = factor(Hypertension_treatment_question)) %>%
-    # Diabetes_question: Recode "Don't know" values to "No",
+    # Diabetes_question: Recode "Don't know" values to "No"
     mutate(Diabetes_question = as.character(Diabetes_question)) %>%
     mutate(Diabetes_question = case_when(
         Diabetes_question == 'No' |
@@ -252,7 +293,7 @@ men_clean <- men_reduced %>%
         Diabetes_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Diabetes_question = factor(Diabetes_question)) %>%
-    # Diabetes_treatment_question: Recode "Don't know..." to 'No'
+    # Diabetes_treatment_question: Recode "Don't know/don't remember" to "No"
     mutate(Diabetes_treatment_question = as.character(Diabetes_treatment_question)) %>%
     mutate(Diabetes_treatment_question = case_when(
         Diabetes_treatment_question == 'No' |
@@ -300,8 +341,44 @@ women_clean <- women_reduced %>%
         Age_years >= 45 & Age_years < 55 ~ '45-54',
         Age_years >= 55 & Age_years < 65 ~ '55-64',
         Age_years >= 65 ~ '65+'
-    )) %>%
-    # Hypertension_question: Recode "Don't know" values to "No",
+    ))
+
+# Check number of "Don't know" / "Don't know/don't remember"
+## Hypertension_question
+women_clean %>%
+    group_by(Hypertension_question) %>%
+    summarise(Count = n()) %>%
+    ungroup() %>%
+    mutate(Percent = 100 * (Count / sum(Count))) # 10 = Don't know (0.16%)
+
+## Hypertension_treatment_question
+women_clean %>%
+    filter(Hypertension_question == 'Yes') %>%
+    group_by(Hypertension_treatment_question) %>%
+    summarise(Count = n()) %>%
+    ungroup() %>%
+    mutate(Percent = 100 * (Count / sum(Count))) # 0 = Don't know/don't remember (0%)
+
+## Diabetes_question
+women_clean %>%
+    group_by(Diabetes_question) %>%
+    summarise(Count = n()) %>%
+    ungroup() %>%
+    mutate(Percent = 100 * (Count / sum(Count))) # 10 = Don't know (0.16%)
+
+## Diabetes_treatment_question
+women_clean %>%
+    filter(Diabetes_question == 'Yes') %>%
+    group_by(Diabetes_treatment_question) %>%
+    summarise(Count = n()) %>%
+    ungroup() %>%
+    mutate(Percent = 100 * (Count / sum(Count))) # 1 = Don't know/don't remember (0.32%)
+
+### "Don't know" or "Don't know/don't remember" missingness < 1% for all variables
+### Therefore, convert all "Don't know" or "Don't know/don't remember" values to "No"
+
+women_final <- women_clean %>%
+    # Hypertension_question: Recode "Don't know" values to "No"
     mutate(Hypertension_question = as.character(Hypertension_question)) %>%
     mutate(Hypertension_question = case_when(
         Hypertension_question == 'No' |
@@ -309,7 +386,7 @@ women_clean <- women_reduced %>%
         Hypertension_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Hypertension_question = factor(Hypertension_question)) %>%
-    # Hypertension_treatment_question: Recode "Don't know..." to 'No'
+    # Hypertension_treatment_question: Recode "Don't know/don't remember" to "No"
     mutate(Hypertension_treatment_question = as.character(Hypertension_treatment_question)) %>%
     mutate(Hypertension_treatment_question = case_when(
         Hypertension_treatment_question == 'No' |
@@ -317,7 +394,7 @@ women_clean <- women_reduced %>%
         Hypertension_treatment_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Hypertension_treatment_question = factor(Hypertension_treatment_question)) %>%
-    # Diabetes_question: Recode "Don't know" values to "No",
+    # Diabetes_question: Recode "Don't know" values to "No"
     mutate(Diabetes_question = as.character(Diabetes_question)) %>%
     mutate(Diabetes_question = case_when(
         Diabetes_question == 'No' |
@@ -325,7 +402,7 @@ women_clean <- women_reduced %>%
         Diabetes_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Diabetes_question = factor(Diabetes_question)) %>%
-    # Diabetes_treatment_question: Recode "Don't know..." to 'No'
+    # Diabetes_treatment_question: Recode "Don't know/don't remember" to "No"
     mutate(Diabetes_treatment_question = as.character(Diabetes_treatment_question)) %>%
     mutate(Diabetes_treatment_question = case_when(
         Diabetes_treatment_question == 'No' |
@@ -338,16 +415,16 @@ women_clean <- women_reduced %>%
 ##############################################
 #   Vertical join: women_clean + men_clean   #
 ##############################################
-sex_clean <- bind_rows(women_clean, men_clean)
+sex_final <- bind_rows(women_final, men_final)
 
 ####################################################
 #   Horizontal join: biomarker_clean + sex_clean   #
 ####################################################
-analysis_set <- sex_clean %>%
+analysis_set <- sex_final %>%
     left_join(biomarker_clean) %>%
     # Select and order columns
     select(V021, V022, SWEIGHT,
-           Sex, Age_years, Age_categories, Rx_assessed,
+           Sex, Age_years, Age_categories, Rx_assessed, Rx_medicines_seen,
            Hypertension_question, Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
            Diabetes_question, Diabetes_treatment_question,
