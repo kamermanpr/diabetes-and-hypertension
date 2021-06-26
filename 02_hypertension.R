@@ -764,6 +764,134 @@ ggsave(filename = 'figures/09_hypertension_age.png',
        width = 8,
        height = 6)
 
+#-- Who has hypertension (measured) vs who recalled receiving a diagnosis --#
+# Crude numbers
+data %>%
+    select(Hypertension_question, Hypertension_measured) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Hypertension_measured, Hypertension_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    ungroup() %>%
+    mutate(Grand_total = sum(Count))
+
+# Analysis
+measured_vs_question_yes <- svyby(~Hypertension_question,
+                                  by = ~Hypertension_measured,
+                                  FUN = svymean,
+                                  design = design_obj,
+                                  vartype = 'ci',
+                                  na.rm = TRUE) %>%
+    as.data.frame() %>%
+    select(Hypertension_measured, ends_with('Yes')) %>%
+    set_names(nm = c('Hypertension_measured', 'estimate', 'ci_lower', 'ci_upper')) %>%
+    mutate(group = 'Question: Yes') %>%
+    mutate(across(where(is.numeric), ~100 * round(.x, 3)))
+
+rownames(measured_vs_question_yes) <- NULL
+
+measured_vs_question_no <- svyby(~Hypertension_question,
+                                 by = ~Hypertension_measured,
+                                 FUN = svymean,
+                                 design = design_obj,
+                                 vartype = 'ci',
+                                 na.rm = TRUE) %>%
+    as.data.frame() %>%
+    select(Hypertension_measured, ends_with('No')) %>%
+    set_names(nm = c('Hypertension_measured', 'estimate', 'ci_lower', 'ci_upper')) %>%
+    mutate(group = 'Question: No') %>%
+    mutate(across(where(is.numeric), ~100 * round(.x, 3)))
+
+rownames(measured_vs_question_no) <- NULL
+
+rbind(measured_vs_question_no, measured_vs_question_yes) %>%
+    kable()
+
+# X-tabulate data taking design into account
+tab_measured_vs_question <- svytable(~Hypertension_question +
+                                          Hypertension_measured,
+                                     design = design_obj)
+
+# Check proportions match those generated in previous steps (Analysis)
+prop.table(tab_measured_vs_question, margin = 2)
+
+#-- Rx for hypertension (prescription data) in those with/without
+# hypertension (measured and question) --#
+data %>%
+    select(Rx_medicines_seen,
+           Hypertension_question,
+           Hypertension_measured,
+           Rx_hypertension) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Hypertension_question, Hypertension_measured, Rx_hypertension) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    ungroup() %>%
+    mutate(Grand_total = sum(Count))
+
+tab_rx <- svytable(~Hypertension_measured + Hypertension_question +
+                        Rx_hypertension + Rx_medicines_seen,
+                   design = design_obj)
+
+ftable(tab_rx) %>%
+    as.data.frame() %>%
+    group_by(Rx_medicines_seen, Hypertension_measured,
+             Hypertension_question) %>%
+    mutate(Sub_total = sum(Freq)) %>%
+    arrange(Sub_total) %>%
+    mutate(Percent_sub_total = 100 * (Freq/Sub_total)) %>%
+    kable()
+
+#-- Rx for hypertension (question data) in those with/without
+# hypertension (measured and question) --#
+data %>%
+    select(Hypertension_question,
+           Hypertension_measured,
+           Hypertension_treatment_question) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Hypertension_question, Hypertension_measured,
+             Hypertension_treatment_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    ungroup() %>%
+    mutate(Grand_total = sum(Count))
+
+tab_rx_question <- svytable(~Hypertension_question + Hypertension_measured +
+                                Hypertension_treatment_question,
+                            design = design_obj)
+
+ftable(tab_rx_question) %>%
+    as.data.frame() %>%
+    group_by(Hypertension_measured, Hypertension_question) %>%
+    mutate(Sub_total = sum(Freq)) %>%
+    arrange(Sub_total) %>%
+    mutate(Percent_sub_total = 100 * (Freq/Sub_total)) %>%
+    kable()
+
+#-- Rx_hypertension vs hypertension_treatment_question --#
+data %>%
+    select(Rx_medicines_seen,
+           Hypertension_treatment_question,
+           Rx_hypertension) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Rx_medicines_seen, Rx_hypertension, Hypertension_treatment_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    ungroup() %>%
+    mutate(Grand_total = sum(Count))
+
+tab_rx_vs_question <- svytable(~Rx_hypertension + Hypertension_treatment_question +
+                                   Rx_medicines_seen,
+                               design = design_obj)
+
+ftable(tab_rx_vs_question) %>%
+    as.data.frame() %>%
+    group_by(Rx_hypertension) %>%
+    mutate(Sub_total = sum(Freq)) %>%
+    arrange(Sub_total) %>%
+    mutate(Percent_sub_total = 100 * (Freq/Sub_total)) %>%
+    kable()
+
 ########################
 #   Publication plot   #
 ########################
@@ -878,3 +1006,14 @@ ggsave(filename = 'figures/figure-1.png',
        plot = plot_stacked,
        height = 16,
        width = 8)
+
+# Diagnosed vs measured
+png(filename = 'figures/figure-3_original.png',
+    res = 300,
+    width = 2400,
+    height = 2400)
+mosaicplot(t(tab_measured_vs_question),
+           main = NULL,
+           color = c('grey30', 'grey90'),
+           cex.axis = 1.2)
+dev.off()
