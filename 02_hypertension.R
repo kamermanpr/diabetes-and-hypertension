@@ -815,8 +815,41 @@ tab_measured_vs_question <- svytable(~Hypertension_question +
 # Check proportions match those generated in previous steps (Analysis)
 prop.table(tab_measured_vs_question, margin = 2)
 
-#-- Rx for hypertension (prescription data) in those with/without
-# hypertension (measured and question) --#
+#-- Sample size for Rx_medicines_seen and Hypertension_treatment_question --#
+# Rx_medicines_seen
+data %>%
+    select(Rx_medicines_seen) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Rx_medicines_seen) %>%
+    summarise(Count = n())
+
+# Hypertension_treatment_question
+data %>%
+    select(Hypertension_treatment_question) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Hypertension_treatment_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count))
+
+#-- Sample size of participants: Rx_medicines_seen with Rx_hypertension data --#
+data %>%
+    select(Rx_medicines_seen, Rx_hypertension) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Rx_medicines_seen, Rx_hypertension) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    mutate(Percent = 100 * (Count / Total))
+
+#-- Sample size of participants: Rx_medicines_seen with Hypertension_treatment_question data --#
+data %>%
+    select(Rx_medicines_seen, Hypertension_treatment_question) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Rx_medicines_seen, Hypertension_treatment_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    mutate(Percent = 100 * (Count / Total))
+
+#-- Rx for hypertension (prescription data) in those with/without hypertension (measured and question) --#
 data %>%
     select(Rx_medicines_seen,
            Hypertension_question,
@@ -842,8 +875,7 @@ ftable(tab_rx) %>%
     mutate(Percent_sub_total = 100 * (Freq/Sub_total)) %>%
     kable()
 
-#-- Rx for hypertension (question data) in those with/without
-# hypertension (measured and question) --#
+#-- Qx for hypertension (question data) in those with/without hypertension (measured and question) --#
 data %>%
     select(Hypertension_question,
            Hypertension_measured,
