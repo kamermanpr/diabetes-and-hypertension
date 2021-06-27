@@ -169,18 +169,18 @@ biomarker_rx <- biomarker_reduced %>%
                                     pattern = 'A10')) %>%
     # Remove Rx column
     select(-Rx) %>%
-    # Fill in <NA> in Rx_* when Rx_assessed is <NA>
-    mutate(Rx_hypertension = ifelse(is.na(Rx_assessed),
-                                    yes = NA,
-                                    no = Rx_hypertension),
-           Rx_diabetes = ifelse(is.na(Rx_assessed),
-                                yes = NA,
-                                no = Rx_diabetes)) %>%
     # Create new columns based on whether Rx_assessed is
     # 'Medicines seen' or not
     mutate(Rx_medicines_seen = ifelse(Rx_assessed == 'Medicines seen',
                                       yes = TRUE,
-                                      no = NA))
+                                      no = NA)) %>%
+    # Fill in <NA> in Rx_* when Rx_medicines_seen is <NA>
+    mutate(Rx_hypertension = ifelse(is.na(Rx_medicines_seen),
+                                    yes = NA,
+                                    no = Rx_hypertension),
+           Rx_diabetes = ifelse(is.na(Rx_medicines_seen),
+                                yes = NA,
+                                no = Rx_diabetes))
 
 # Join biomarker_BP, biomarker_HBA1c, and biomarker_rx
 biomarker_clean <- biomarker_BP %>%
@@ -410,7 +410,6 @@ women_final <- women_clean %>%
         Diabetes_treatment_question == 'Yes' ~ 'Yes'
     )) %>%
     mutate(Diabetes_treatment_question = factor(Diabetes_treatment_question))
-
 
 ##############################################
 #   Vertical join: women_clean + men_clean   #
