@@ -875,6 +875,15 @@ ftable(tab_rx) %>%
     mutate(Percent_sub_total = 100 * (Freq/Sub_total)) %>%
     kable()
 
+svyby(~ Rx_hypertension,
+      by = ~ Hypertension_measured + Hypertension_question,
+      design = design_obj,
+      FUN = svymean,
+      na.rm = TRUE,
+      vartype = 'ci') %>%
+    select(1:2, ends_with('TRUE')) %>%
+    mutate(across(.cols = ends_with('TRUE'), ~ round(100 * .x, 1)))
+
 #-- Qx for hypertension (question data) in those with/without hypertension (measured and question) --#
 data %>%
     select(Hypertension_question,
