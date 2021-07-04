@@ -1040,7 +1040,7 @@ ggsave(filename = 'figures/figure-1.png',
        width = 8)
 
 # Diagnosed vs measured
-png(filename = 'figures/figure-3_original.png',
+png(filename = 'figures/figure-2_original.png',
     res = 300,
     width = 2400,
     height = 2400)
