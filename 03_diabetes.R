@@ -579,6 +579,175 @@ ggsave(filename = 'figures/15_diabetes_age.png',
        width = 8,
        height = 6)
 
+#-- Who has diabetes (measured) vs who recalled receiving a diagnosis --#
+# Crude numbers
+data %>%
+    select(Diabetes_question, Diabetes_measured) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Diabetes_measured, Diabetes_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    ungroup() %>%
+    mutate(Grand_total = sum(Count))
+
+# Analysis
+measured_vs_question_yes <- svyby(~Diabetes_question,
+                                  by = ~Diabetes_measured,
+                                  FUN = svymean,
+                                  design = design_obj,
+                                  vartype = 'ci',
+                                  na.rm = TRUE) %>%
+    as.data.frame() %>%
+    select(Diabetes_measured, ends_with('Yes')) %>%
+    set_names(nm = c('Diabetes_measured', 'estimate', 'ci_lower', 'ci_upper')) %>%
+    mutate(group = 'Question: Yes') %>%
+    mutate(across(where(is.numeric), ~100 * round(.x, 3)))
+
+rownames(measured_vs_question_yes) <- NULL
+
+measured_vs_question_no <- svyby(~Diabetes_question,
+                                 by = ~Diabetes_measured,
+                                 FUN = svymean,
+                                 design = design_obj,
+                                 vartype = 'ci',
+                                 na.rm = TRUE) %>%
+    as.data.frame() %>%
+    select(Diabetes_measured, ends_with('No')) %>%
+    set_names(nm = c('Diabetes_measured', 'estimate', 'ci_lower', 'ci_upper')) %>%
+    mutate(group = 'Question: No') %>%
+    mutate(across(where(is.numeric), ~100 * round(.x, 3)))
+
+rownames(measured_vs_question_no) <- NULL
+
+rbind(measured_vs_question_no, measured_vs_question_yes) %>%
+    kable()
+
+# X-tabulate data taking design into account
+tab_measured_vs_question <- svytable(~Diabetes_question +
+                                         Diabetes_measured,
+                                     design = design_obj)
+
+# Check proportions match those generated in previous steps (Analysis)
+prop.table(tab_measured_vs_question, margin = 2)
+
+#-- Sample size for Rx_medicines_seen and Diabetes_treatment_question --#
+# Rx_medicines_seen
+data %>%
+    select(Rx_medicines_seen) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Rx_medicines_seen) %>%
+    summarise(Count = n())
+
+# Diabetes_treatment_question
+data %>%
+    select(Diabetes_treatment_question) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Diabetes_treatment_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count))
+
+#-- Sample size of participants: Rx_medicines_seen with Rx_diabetes data --#
+data %>%
+    select(Rx_medicines_seen, Rx_diabetes) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Rx_medicines_seen, Rx_diabetes) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    mutate(Percent = 100 * (Count / Total))
+
+#-- Sample size of participants: Rx_medicines_seen with Diabetes_treatment_question data --#
+data %>%
+    select(Rx_medicines_seen, Diabetes_treatment_question) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Rx_medicines_seen, Diabetes_treatment_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    mutate(Percent = 100 * (Count / Total))
+
+#-- Rx for diabetes (prescription data) in those with/without diabetes (measured and question) --#
+data %>%
+    select(Rx_medicines_seen,
+           Diabetes_question,
+           Diabetes_measured,
+           Rx_diabetes) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Diabetes_question, Diabetes_measured, Rx_diabetes) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    ungroup() %>%
+    mutate(Grand_total = sum(Count))
+
+tab_rx <- svytable(~Diabetes_measured + Diabetes_question +
+                       Rx_diabetes + Rx_medicines_seen,
+                   design = design_obj)
+
+ftable(tab_rx) %>%
+    as.data.frame() %>%
+    group_by(Rx_medicines_seen, Diabetes_measured,
+             Diabetes_question) %>%
+    mutate(Sub_total = sum(Freq)) %>%
+    arrange(Sub_total) %>%
+    mutate(Percent_sub_total = 100 * (Freq/Sub_total)) %>%
+    kable()
+
+svyby(~ Rx_diabetes,
+      by = ~ Diabetes_measured + Diabetes_question,
+      design = design_obj,
+      FUN = svymean,
+      na.rm = TRUE,
+      vartype = 'ci') %>%
+    select(1:2, ends_with('TRUE')) %>%
+    mutate(across(.cols = ends_with('TRUE'), ~ round(100 * .x, 1)))
+
+#-- Qx for diabetes (question data) in those with/without diabetes (measured and question) --#
+data %>%
+    select(Diabetes_question,
+           Diabetes_measured,
+           Diabetes_treatment_question) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Diabetes_question, Diabetes_measured,
+             Diabetes_treatment_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    ungroup() %>%
+    mutate(Grand_total = sum(Count))
+
+tab_rx_question <- svytable(~Diabetes_question + Diabetes_measured +
+                                Diabetes_treatment_question,
+                            design = design_obj)
+
+ftable(tab_rx_question) %>%
+    as.data.frame() %>%
+    group_by(Diabetes_measured, Diabetes_question) %>%
+    mutate(Sub_total = sum(Freq)) %>%
+    arrange(Sub_total) %>%
+    mutate(Percent_sub_total = 100 * (Freq/Sub_total)) %>%
+    kable()
+
+#-- Rx_diabetes vs diabetes_treatment_question --#
+data %>%
+    select(Rx_medicines_seen,
+           Diabetes_treatment_question,
+           Rx_diabetes) %>%
+    filter(complete.cases(.)) %>%
+    group_by(Rx_medicines_seen, Rx_diabetes, Diabetes_treatment_question) %>%
+    summarise(Count = n()) %>%
+    mutate(Total = sum(Count)) %>%
+    ungroup() %>%
+    mutate(Grand_total = sum(Count))
+
+tab_rx_vs_question <- svytable(~Rx_diabetes + Diabetes_treatment_question +
+                                   Rx_medicines_seen,
+                               design = design_obj)
+
+ftable(tab_rx_vs_question) %>%
+    as.data.frame() %>%
+    group_by(Rx_diabetes) %>%
+    mutate(Sub_total = sum(Freq)) %>%
+    arrange(Sub_total) %>%
+    mutate(Percent_sub_total = 100 * (Freq/Sub_total)) %>%
+    kable()
+
 ########################
 #   Publication plot   #
 ########################
@@ -689,7 +858,18 @@ plot_stacked <- plot_DB_stack +
     plot_DB_age_stack +
     plot_layout(ncol = 1)
 
-ggsave(filename = 'figures/figure-2.png',
+ggsave(filename = 'figures/figure-3.png',
        plot = plot_stacked,
        height = 16,
        width = 8)
+
+# Diagnosed vs measured
+png(filename = 'figures/figure-4_original.png',
+    res = 300,
+    width = 2400,
+    height = 2400)
+mosaicplot(t(tab_measured_vs_question),
+           main = NULL,
+           color = c('grey30', 'grey90'),
+           cex.axis = 1.2)
+dev.off()
