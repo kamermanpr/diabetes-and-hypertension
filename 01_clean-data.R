@@ -444,7 +444,7 @@ analysis_set <- sex_final %>%
     # Select and order columns
     select(V021, V022, SWEIGHT,
            Sex, Age_years, Age_categories, Rx_assessed, Rx_medicines_seen,
-           Hypertension_question, Hypertension_treatment_question,
+           BP_category, Hypertension_question, Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
            Diabetes_question, Diabetes_treatment_question,
            Rx_diabetes, Diabetes_measured, HBA1C)
