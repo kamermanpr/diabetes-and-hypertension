@@ -67,8 +67,8 @@ biomarker_reduced <- biomarker %>%
            DBP_men_2 = SH328B,
            SBP_men_3 = SH332A,
            DBP_men_3 = SH332B,
-           BP_medication_women = SH224,
-           BP_medication_men = SH324,
+           BP_medication_biomarker_women = SH224,
+           BP_medication_biomarker_men = SH324,
            BP_category_women = SH244,
            BP_category_men = SH344,
            HBA1C_women = SHWHBA1C,
@@ -205,7 +205,7 @@ men_reduced <- men %>%
            MV002, # Household number
            MV003, # Respondent line number
            MV021, # Primary sampling unit (PSU)
-           MV022, # Sampling strata
+           MV023, # Sampling strata
            SMWEIGHT, # Sample weight Note: 6 decimals implicit
            MV012, # Age in years
            SM1108A, # Diagnosed with high blood pressure
@@ -217,7 +217,7 @@ men_reduced <- men %>%
            V002 = MV002,
            V003 = MV003,
            V021 = MV021,
-           V022 = MV022,
+           V023 = MV023,
            SWEIGHT = SMWEIGHT,
            Age_years = MV012,
            Hypertension_question =  SM1108A,
@@ -320,7 +320,7 @@ women_reduced <- women %>%
            V002, # Household number
            V003, # Respondent line number
            V021, # Primary sampling unit (PSU)
-           V022, # Sampling strata
+           V023, # Sampling strata
            SWEIGHT, # Sample weight Note: 6 decimals implicit
            V012, # Age in years
            S1413A, # Diagnosed with high blood pressure
@@ -430,10 +430,10 @@ sex_final <- bind_rows(women_final, men_final)
 analysis_set <- sex_final %>%
     left_join(biomarker_clean) %>%
     # Select and order columns
-    select(V021, V022, SWEIGHT,
+    select(V021, V023, SWEIGHT,
            Sex, Age_years, Age_categories, Rx_assessed, Rx_medicines_seen,
-           BP_category_men, BP_category_women, BP_medication_women,
-           BP_medication_men, Hypertension_question,
+           BP_category_men, BP_category_women, BP_medication_biomarker_women,
+           BP_medication_biomarker_men, Hypertension_question,
            Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
            Diabetes_question, Diabetes_treatment_question,

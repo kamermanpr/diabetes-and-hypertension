@@ -1,4 +1,4 @@
-V021,V022,SWEIGHT,Sex,Age_years,Age_categories,Rx_assessed,Rx_medicines_seen,BP_category_men,BP_category_women,BP_medication_women,BP_medication_men,Hypertension_question,Hypertension_treatment_question,Rx_hypertension,Hypertension_measured,SBP,DBP,Diabetes_question,Diabetes_treatment_question,Rx_diabetes,Diabetes_measured,HBA1C
+V021,V023,SWEIGHT,Sex,Age_years,Age_categories,Rx_assessed,Rx_medicines_seen,BP_category_men,BP_category_women,BP_medication_biomarker_women,BP_medication_biomarker_men,Hypertension_question,Hypertension_treatment_question,Rx_hypertension,Hypertension_measured,SBP,DBP,Diabetes_question,Diabetes_treatment_question,Rx_diabetes,Diabetes_measured,HBA1C
 1,Urban - Gauteng,1.447395,Female,41,35-44,None,NA,NA,Normal (moderately high),No,NA,No,NA,NA,No,125.5,79.5,No,NA,NA,No,5.85
 1,Urban - Gauteng,1.447395,Female,41,35-44,Not present,NA,NA,Abnormal (moderately elevated),Yes,NA,No,NA,NA,Yes,151.5,101,No,NA,NA,Yes,7.168
 1,Urban - Gauteng,1.447395,Female,27,25-34,Not present,NA,NA,NA,NA,NA,No,NA,NA,NA,NA,NA,No,NA,NA,NA,NA
