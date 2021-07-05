@@ -46,6 +46,8 @@ biomarker_reduced <- biomarker %>%
            SH328B, # Second reading diastolic (men)
            SH332A, # Third reading systolic (men)
            SH332B, # Third reading diastolic (men)
+           SH244, # Blood pressure category (women)
+           SH344, # Blood pressure category (men)
            SHWHBA1C, # HBA1c (women). Note: 3 decimals implicit
            SHMHBA1C, # HBA1c (men). Note: 3 decimals implicit
            starts_with('SH277'), # Female medication check-list
@@ -63,6 +65,8 @@ biomarker_reduced <- biomarker %>%
            DBP_men_2 = SH328B,
            SBP_men_3 = SH332A,
            DBP_men_3 = SH332B,
+           BP_category_women = SH244,
+           BP_category_men = SH344,
            HBA1C_women = SHWHBA1C,
            HBA1C_men = SHMHBA1C)
 
@@ -70,6 +74,22 @@ biomarker_reduced <- biomarker %>%
 biomarker_BP <- biomarker_reduced %>%
     # Select columns
     select(-starts_with('HBA1C'), -starts_with('SH277'), -starts_with('SH377')) %>%
+    # Clean-up blood pressure category
+    # Convert columns to charcater
+    mutate(across(.cols = starts_with('BP_cat'), ~as.character(.x))) %>%
+    # Consolidate mens and womens columns into a single column
+    mutate(BP_category = ifelse(is.na(BP_category_women),
+                                yes = BP_category_men,
+                                no = BP_category_women)) %>%
+    # Recode as hypertensive and normotensive
+    mutate(BP_category = case_when(
+        str_detect(BP_category, pattern = 'Normal', ) ~ 'Normotensive',
+        str_detect(BP_category, pattern = 'Abnormal') ~ 'Hypertensive'
+    )) %>%
+    # Remove unwanted columns
+    select(-BP_category_men, -BP_category_women) %>%
+    # Convert BP_category column to a factor
+    mutate(BP_category = factor(BP_category)) %>%
     # Convert all BP columns to numeric format
     # Conversion will convert all non-numeric codes ('Other' and 'Technical problems') to <NA>
     mutate(across(.cols = starts_with('SBP'), ~as.numeric(as.character(.x))),
