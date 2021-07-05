@@ -74,22 +74,6 @@ biomarker_reduced <- biomarker %>%
 biomarker_BP <- biomarker_reduced %>%
     # Select columns
     select(-starts_with('HBA1C'), -starts_with('SH277'), -starts_with('SH377')) %>%
-    # Clean-up blood pressure category
-    # Convert columns to charcater
-    mutate(across(.cols = starts_with('BP_cat'), ~as.character(.x))) %>%
-    # Consolidate mens and womens columns into a single column
-    mutate(BP_category = ifelse(is.na(BP_category_women),
-                                yes = BP_category_men,
-                                no = BP_category_women)) %>%
-    # Recode as hypertensive and normotensive
-    mutate(BP_category = case_when(
-        str_detect(BP_category, pattern = 'Normal', ) ~ 'Normotensive',
-        str_detect(BP_category, pattern = 'Abnormal') ~ 'Hypertensive'
-    )) %>%
-    # Remove unwanted columns
-    select(-BP_category_men, -BP_category_women) %>%
-    # Convert BP_category column to a factor
-    mutate(BP_category = factor(BP_category)) %>%
     # Convert all BP columns to numeric format
     # Conversion will convert all non-numeric codes ('Other' and 'Technical problems') to <NA>
     mutate(across(.cols = starts_with('SBP'), ~as.numeric(as.character(.x))),
@@ -444,7 +428,8 @@ analysis_set <- sex_final %>%
     # Select and order columns
     select(V021, V022, SWEIGHT,
            Sex, Age_years, Age_categories, Rx_assessed, Rx_medicines_seen,
-           BP_category, Hypertension_question, Hypertension_treatment_question,
+           BP_category_men, BP_category_women, Hypertension_question,
+           Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
            Diabetes_question, Diabetes_treatment_question,
            Rx_diabetes, Diabetes_measured, HBA1C)
