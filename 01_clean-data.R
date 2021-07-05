@@ -46,6 +46,8 @@ biomarker_reduced <- biomarker %>%
            SH328B, # Second reading diastolic (men)
            SH332A, # Third reading systolic (men)
            SH332B, # Third reading diastolic (men)
+           SH224, # Taking blood pressure medication (women)
+           SH324, # Taking blood pressure medication (men)
            SH244, # Blood pressure category (women)
            SH344, # Blood pressure category (men)
            SHWHBA1C, # HBA1c (women). Note: 3 decimals implicit
@@ -65,6 +67,8 @@ biomarker_reduced <- biomarker %>%
            DBP_men_2 = SH328B,
            SBP_men_3 = SH332A,
            DBP_men_3 = SH332B,
+           BP_medication_women = SH224,
+           BP_medication_men = SH324,
            BP_category_women = SH244,
            BP_category_men = SH344,
            HBA1C_women = SHWHBA1C,
@@ -428,7 +432,8 @@ analysis_set <- sex_final %>%
     # Select and order columns
     select(V021, V022, SWEIGHT,
            Sex, Age_years, Age_categories, Rx_assessed, Rx_medicines_seen,
-           BP_category_men, BP_category_women, Hypertension_question,
+           BP_category_men, BP_category_women, BP_medication_women,
+           BP_medication_men, Hypertension_question,
            Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
            Diabetes_question, Diabetes_treatment_question,
