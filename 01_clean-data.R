@@ -218,7 +218,9 @@ biomarker_rx <- biomarker_reduced %>%
 # Join biomarker_BP, biomarker_HBA1c, and biomarker_rx
 biomarker_clean <- biomarker_BP %>%
     inner_join(biomarker_HBA1c) %>%
-    inner_join(biomarker_rx)
+    inner_join(biomarker_rx) %>%
+    # Add questionnaire indicator
+    mutate(Questionnaire = 'Biomarker')
 
 ########################
 #   Clean men's data   #
@@ -456,7 +458,7 @@ analysis_set <- sex_final %>%
     inner_join(biomarker_clean) %>%
     # Select and order columns
     select(V021, V023, SWEIGHT,
-           Sex, Age_years, Age_categories, Rx_assessed, Rx_medicines_seen,
+           Sex, Age_years, Age_categories, Questionnaire, Rx_assessed, Rx_medicines_seen,
            BP_category, BP_taking_antihypertensive, BP_told_hypertensive,
            Hypertension_question, Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
