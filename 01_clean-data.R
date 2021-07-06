@@ -209,12 +209,16 @@ biomarker_rx <- biomarker_reduced %>%
                                     no = Rx_hypertension),
            Rx_diabetes = ifelse(is.na(Rx_medicines_seen),
                                 yes = NA,
-                                no = Rx_diabetes))
+                                no = Rx_diabetes)) %>%
+    # Order columns
+    select(V001, V002, V003,
+           Rx_assessed, Rx_medicines_seen,
+           Rx_hypertension, Rx_diabetes)
 
 # Join biomarker_BP, biomarker_HBA1c, and biomarker_rx
 biomarker_clean <- biomarker_BP %>%
-    left_join(biomarker_HBA1c) %>%
-    left_join(biomarker_rx)
+    inner_join(biomarker_HBA1c) %>%
+    inner_join(biomarker_rx)
 
 ########################
 #   Clean men's data   #
@@ -449,14 +453,12 @@ sex_final <- bind_rows(women_final, men_final)
 #   Horizontal join: biomarker_clean + sex_clean   #
 ####################################################
 analysis_set <- sex_final %>%
-    left_join(biomarker_clean) %>%
+    inner_join(biomarker_clean) %>%
     # Select and order columns
     select(V021, V023, SWEIGHT,
            Sex, Age_years, Age_categories, Rx_assessed, Rx_medicines_seen,
-           BP_category_men, BP_category_women, BP_taking_antihypertensive_women,
-           BP_taking_antihypertensive_men, BP_told_hypertension_women,
-           BP_told_hypertension_men, Hypertension_question,
-           Hypertension_treatment_question,
+           BP_category, BP_taking_antihypertensive, BP_told_hypertensive,
+           Hypertension_question, Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
            Diabetes_question, Diabetes_treatment_question,
            Rx_diabetes, Diabetes_measured, HBA1C)
