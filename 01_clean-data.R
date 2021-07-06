@@ -46,6 +46,8 @@ biomarker_reduced <- biomarker %>%
            SH328B, # Second reading diastolic (men)
            SH332A, # Third reading systolic (men)
            SH332B, # Third reading diastolic (men)
+           SH223, # Told hypertensive (women)
+           SH323, # Told hypertensive (men)
            SH224, # Taking blood pressure medication (women)
            SH324, # Taking blood pressure medication (men)
            SH244, # Blood pressure category (women)
@@ -67,8 +69,10 @@ biomarker_reduced <- biomarker %>%
            DBP_men_2 = SH328B,
            SBP_men_3 = SH332A,
            DBP_men_3 = SH332B,
-           BP_medication_biomarker_women = SH224,
-           BP_medication_biomarker_men = SH324,
+           BP_told_hypertension_women = SH223,
+           BP_told_hypertension_men = SH323,
+           BP_taking_antihypertensive_women = SH224,
+           BP_taking_antihypertensive_men = SH324,
            BP_category_women = SH244,
            BP_category_men = SH344,
            HBA1C_women = SHWHBA1C,
@@ -78,7 +82,24 @@ biomarker_reduced <- biomarker %>%
 biomarker_BP <- biomarker_reduced %>%
     # Select columns
     select(-starts_with('HBA1C'), -starts_with('SH277'), -starts_with('SH377')) %>%
-    # Convert all BP columns to numeric format
+    # Convert blood pressure (BP) columns to character
+    mutate(across(.cols = starts_with('BP_'), ~as.character(.x))) %>%
+    # Combine male and female BP columns for each variable
+    mutate(BP_category = ifelse(is.na(BP_category_women),
+                                yes = BP_category_men,
+                                no = BP_category_women)) %>%
+    select(-BP_category_women, -BP_category_men) %>%
+    mutate(BP_taking_antihypertensive = ifelse(is.na(BP_taking_antihypertensive_women),
+                                               yes = BP_taking_antihypertensive_men,
+                                               no = BP_taking_antihypertensive_women)) %>%
+    select(-BP_taking_antihypertensive_women, -BP_taking_antihypertensive_men) %>%
+    mutate(BP_told_hypertensive = ifelse(is.na(BP_told_hypertension_women),
+                                               yes = BP_told_hypertension_men,
+                                               no = BP_told_hypertension_women)) %>%
+    select(-BP_told_hypertension_women, -BP_told_hypertension_men) %>%
+    # Convert BP columns back to factor
+    mutate(across(.cols = starts_with('BP_'), ~factor(.x))) %>%
+    # Convert systolic and diastolic blood pressure columns to numeric format
     # Conversion will convert all non-numeric codes ('Other' and 'Technical problems') to <NA>
     mutate(across(.cols = starts_with('SBP'), ~as.numeric(as.character(.x))),
            across(.cols = starts_with('DBP'), ~as.numeric(as.character(.x)))) %>%
@@ -432,8 +453,9 @@ analysis_set <- sex_final %>%
     # Select and order columns
     select(V021, V023, SWEIGHT,
            Sex, Age_years, Age_categories, Rx_assessed, Rx_medicines_seen,
-           BP_category_men, BP_category_women, BP_medication_biomarker_women,
-           BP_medication_biomarker_men, Hypertension_question,
+           BP_category_men, BP_category_women, BP_taking_antihypertensive_women,
+           BP_taking_antihypertensive_men, BP_told_hypertension_women,
+           BP_told_hypertension_men, Hypertension_question,
            Hypertension_treatment_question,
            Rx_hypertension, Hypertension_measured, SBP, DBP,
            Diabetes_question, Diabetes_treatment_question,
