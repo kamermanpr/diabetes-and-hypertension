@@ -2,9 +2,6 @@
 ## cd to where the docker file is located.
 # docker build -t kamermanpr/diabetes-and-hypertension:v1.0 .
 
-#-- Push build to DockerHub --#
-# docker push
-
 #-- The build image can be downloaded from Docker Hub --#
 # docker pull kamermanpr/diabetes-and-hypertension:v1.0
 
