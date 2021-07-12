@@ -39,7 +39,7 @@ Enter: `docker run --name diabetes -d -p 8787:8787 -e USER=user -e PASSWORD=pass
 
 - In the _Files_ tab on the lower right panel of RStudio, click **Upload**, located the zip file you downloaded and the click **OK**. The zip file will be uploaded and will automatically unzip, giving you access to all the content, including the analysis scripts, for the project.
 
-- In the _Files_ tab, double-click the **alpaca-data.Rproj** file to ensure all the working directories are in order before running any of the scripts.
+- In the _Files_ tab, double-click the **diabetes-and-hypertension.Rproj** file to ensure all the working directories are in order before running any of the scripts.
 
 - Open the individual `R` scripts and run them. Note, the `01_clean-data.R` script will not run unless you have obtained the original data files from the DHS Program and set the file paths in the script to where the original data files have been saved to on your computer.
 
