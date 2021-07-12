@@ -37,7 +37,7 @@ data <- readRDS('data-clean/analysis-set.rds')
 #   Create design object   #
 ############################
 design_obj <- svydesign(ids = ~V021, # Primary sampling units
-                        strata = ~V022, # Strata
+                        strata = ~V023, # Strata
                         weights = ~SWEIGHT, # Design weights
                         data = data)
 
