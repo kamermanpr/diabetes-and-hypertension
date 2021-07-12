@@ -1,5 +1,7 @@
 # Under-diagnosis of diabetes and hypertension
 
+[![DOI](https://zenodo.org/badge/378867751.svg)](https://zenodo.org/badge/latestdoi/378867751)
+
 Under-diagnosis of diabetes and hypertension in South Africa. Analysis of the South African DHS 2016 data.
 
 ## Bibliometric information
