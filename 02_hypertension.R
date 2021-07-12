@@ -37,7 +37,7 @@ data <- readRDS('data-clean/analysis-set.rds')
 #   Create design object   #
 ############################
 design_obj <- svydesign(ids = ~V021, # Primary sampling units
-                        strata = ~V022, # Strata
+                        strata = ~V023, # Strata
                         weights = ~SWEIGHT, # Design weights
                         data = data)
 
@@ -436,13 +436,12 @@ dev.off()
 ##########################################
 #   Hypertension: measured vs reported   #
 ##########################################
-
 #-- No stratification --#
 # Question
 ## Crude sample size
 data %>%
     filter(!is.na(Hypertension_question)) %>%
-    group_by(Hypertension_question) %>%
+    group_by(Sex, Hypertension_question) %>%
     summarise(n = n()) %>%
     mutate(total = sum(n))
 
@@ -816,6 +815,15 @@ tab_measured_vs_question <- svytable(~Hypertension_question +
 prop.table(tab_measured_vs_question, margin = 2)
 
 #-- Sample size for Rx_medicines_seen and Hypertension_treatment_question --#
+# Rx any
+## Crude count
+data %>%
+  select(Rx_assessed) %>%
+  filter(complete.cases(.)) %>%
+  group_by(Rx_assessed) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count))
+
 # Rx_medicines_seen
 data %>%
     select(Rx_medicines_seen) %>%
