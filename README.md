@@ -8,7 +8,15 @@ Under-diagnosis of diabetes and hypertension in South Africa. Analysis of the So
 
 
 ## Abstract
+**Background.** Hypertension and diabetes mellitus are major causes of natural death in South Africa. Under-diagnosis of these treatable diseases would hamper efforts to improve management and hence reduce morbidity and mortality for these conditions.
 
+**Objective.** To assess the level of under-diagnosis of hypertension and diabetes in South Africa.
+
+**Methods.** I used data from adult participants (≥15 years old) of the 2016 edition of the South African Demographics and Health Survey, a survey that draws a nationally representative sample of the population. Using these data, I assessed the prevalences of hypertension and diabetes mellitus at the time of the study using objective criteria (hypertension: systolic blood pressure ≥140 mmHg and/or diastolic blood pressure ≥90 mmHg; diabetes: HbA1c ≥6.5%), and disease prevalences based on participant recall of having ever received a diagnosis of hypertension or diabetes from a healthcare professional. I calculated the difference between the objectively measured prevalences of the diseases and the prevalences based on recall to get an estimate of the level of under-diagnosis of the diseases. 
+
+**Results.** 10 336 adult participants answered the question on the recall of a diagnosis, 8 092 had their blood pressure measured, and 6 740 had HbA1c assessed. The prevalence of hypertension based on recall was 18.9% (95% CI: 17.7 to 20.1%), while the prevalence using blood pressure measurements was 37.1% (95% CI: 35.3 to 38.9%). Thus, 49% of cases of hypertension are undiagnosed (~7.1 million people). The prevalence of diabetes based on recall was 4.5% (95% CI: 3.9 to 5.1%), and 11.4% (95% CI: 10.4 to 12.4%) based on HbA1c values. Thus, 61% of cases of diabetes are undiagnosed (~2.7 million people).
+
+**Conclusion.** There is significant under-diagnosis of hypertension and diabetes mellitus in South Africa. The under-diagnosis of these two treatable conditions, which have high morbidity and mortality, has major population health implications.  
 
 ## Reproducibility
 
